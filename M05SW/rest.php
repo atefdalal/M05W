@@ -12,7 +12,7 @@
          print_r($req_data);
      }
 
-    //Afficher si c'est une requette GET ou POST 
+    //Afficher si c'est une requette GET 
     $req_type=$_SERVER['REQUEST_METHOD'];
 
     if ($req_type == 'GET'){
@@ -27,14 +27,41 @@
             print_r($reponse);  
         }
 
-        if (isset($req_data[1]) && $req_data[1] == 'mesure')
-        {
-            $req = "SELECT * FROM mesure WHERE instant=? ";
-            $reqprepare=$maConnexion->prepare($req);
-            $tableauDeDonees=array($req_data[2]);
-            $reqprepare->execute($tableauDeDonees);
-            $reponse=$reqprepare->fetchAll(PDO::FETCH_ASSOC);
-            print_r($reponse);  
+        //rest.php/mesure/[date]
+        if (isset($req_data[2]) && isset($req_data[3]) && strtotime($req_data[2]) && strtotime($req_data[3])) {
+            $reg = "SELECT * FROM mesure WHERE instant BETWEEN ? AND ?";
+            $regpreparer = $maConnexion->prepare($reg);
+            $tableauDeDonnees = array($req_data[2], $req_data[3]);
+            $regpreparer->execute($tableauDeDonnees);
+            $reponse = $regpreparer->fetchAll(PDO::FETCH_ASSOC);
+            print_r(json_encode($reponse));
+
+        //rest.php/mesure/[datedebut]/[datfin]
+        } elseif (isset($req_data[2]) && isset($req_data[3]) && strtotime($req_data[2]) && strtotime($req_data[3])) {
+            $reg = "SELECT * FROM mesure WHERE instant BETWEEN ? AND ?";
+            $regpreparer = $maConnexion->prepare($reg);
+            $tableauDeDonnees = array($req_data[2], $req_data[3]);
+            $regpreparer->execute($tableauDeDonnees);
+            $reponse = $regpreparer->fetchAll(PDO::FETCH_ASSOC);
+            print_r(json_encode($reponse));
+
+        //rest.php/mesure/vitesse
+        } elseif (isset($req_data[2]) && $req_data[2] === 'vitesse') {
+            $reg = "SELECT vitesse FROM mesure";
+            $regpreparer = $maConnexion->prepare($reg);
+            $tableauDeDonnees = array();
+            $regpreparer->execute($tableauDeDonnees);
+            $reponse = $regpreparer->fetchAll(PDO::FETCH_ASSOC);
+            print_r(json_encode($reponse));
+
+        //rest.php/mesure/régime
+        } elseif (isset($req_data[2]) && $req_data[2] === 'regime') {
+            $req = "SELECT regime FROM mesure";
+            $regpreparer = $maConnexion->prepare($req);
+            $tableauDeDonnees = array();
+            $regpreparer->execute($tableauDeDonnees);
+            $reponse = $regpreparer->fetchAll(PDO::FETCH_ASSOC);
+            print_r(json_encode($reponse));
         }
     } 
 
